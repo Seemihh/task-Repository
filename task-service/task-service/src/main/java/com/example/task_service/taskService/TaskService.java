@@ -2,39 +2,74 @@ package com.example.task_service.taskService;
 
 import com.example.task_service.task.Task;
 import com.example.task_service.task.Task;
+import com.example.task_service.taskDTO.TaskDTO;
+import com.example.task_service.taskRepository.TaskRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class TaskService {
 
-    public static List<Task> getByFlightId(long flightId) {
-        Task task1 = new Task();
-        Task task2 = new Task();
-        Task task3 = new Task();
-        task1.setId(151);
-        task2.setId(152);
-        task3.setId(153);
-        task1.setTitle("asd1");
-        task2.setTitle("asd2");
-        task3.setTitle("asd3");
-        task1.setFlightId(1);
-        task2.setFlightId(1);
-        task3.setFlightId(2);
-        List<Task> taskList = new ArrayList<>();
-        taskList.add(task1);
-        taskList.add(task2);
-        taskList.add(task3);
-        List<Task> filterTasks = new ArrayList<>();
-        for (Task task : taskList) {
-            if (task.getFlightId() == flightId) {
-                filterTasks.add(task);
-            }
-        }
-        return filterTasks;
+    private final TaskRepository taskRepository;
+
+    public TaskService(TaskRepository taskRepository) {
+        this.taskRepository = taskRepository;
     }
-    //task-service
-}
+
+    public  List<Task> getByFlightId(long flightId) {
+            return taskRepository.findByFlightId(flightId);
+    }
+    public Task saveTask(TaskDTO taskDTO) {
+        Task newTask = new Task();
+        newTask.setId(taskDTO.getId());
+        newTask.setTitle(taskDTO.getTitle());
+        newTask.setStartDate(taskDTO.getStartDate());
+        newTask.setEndDate(taskDTO.getEndDate());
+        newTask.setFlightId(taskDTO.getFlightId());
+
+        taskRepository.save(newTask);
+        return newTask;
+    }
+
+    public Task findTask(long flightId) {
+        Optional<Task> myTask = taskRepository.findById(flightId);
+        return myTask.get();
+
+    }
+
+    public Task updateTask(TaskDTO taskDTO) {
+        Optional<Task> optionalTask = taskRepository.findById(taskDTO.getId());
+        if (optionalTask.isPresent()) {
+            Task task = optionalTask.get();
+            task.setTitle(taskDTO.getTitle());
+            task.setStartDate(taskDTO.getStartDate());
+            task.setEndDate(taskDTO.getEndDate());
+            task.setFlightId(taskDTO.getFlightId());
+            return taskRepository.save(task);
+
+        } else {
+
+            return null;
+        }
+    }
+        public long deleteTask ( long task_Id){
+            taskRepository.deleteById(task_Id);
+            return task_Id;
+        }
+        public TaskDTO TaskToDTO(Task task){
+        TaskDTO myTask = new TaskDTO();
+        myTask.setId(task.getId());
+        myTask.setEndDate(task.getEndDate());
+        myTask.setStartDate(task.getStartDate());
+        myTask.setFlightId(task.getFlightId());
+        myTask.setTitle(task.getTitle());
+        return myTask;
+        }
+
+
+    }
+
