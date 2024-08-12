@@ -13,10 +13,13 @@ import java.util.List;
 @RestController
 
 public class TaskController {
-    @Autowired
     private TaskService taskService;
-    @Autowired
     private TaskServiceApplication taskServiceApplication;
+
+    public TaskController(TaskServiceApplication taskServiceApplication, TaskService taskService) {
+        this.taskServiceApplication = taskServiceApplication;
+        this.taskService = taskService;
+    }
 
     @GetMapping("task/process")
     public List<Task> process(@RequestParam("flightId") Long flightId) {
